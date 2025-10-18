@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
+// Casey Code
+
 // BLE Server variables
 NimBLEServer* pServer = nullptr;
 NimBLEService* pService = nullptr;
