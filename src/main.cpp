@@ -9,12 +9,14 @@ NimBLECharacteristic* pWriteCharacteristic = nullptr;
 NimBLEAdvertising* pAdvertising = nullptr;
 
 // UUIDs for service and characteristics
-#define SERVICE_UUID        "12345678-1234-5678-9012-123456789abc"
 #define CHARACTERISTIC_UUID "87654321-4321-8765-2109-cba987654321"
 #define WRITE_CHAR_UUID     "abcdef01-2345-6789-abcd-ef0123456789"
 
 // Device name for advertising
 #define DEVICE_NAME "ModPill"
+
+// Service UUID (was missing) - keep consistent with characteristic
+#define SERVICE_UUID "12345678-1234-5678-1234-56789abcdef0"
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -102,10 +104,16 @@ void initBLE() {
     
     // Start advertising
     pAdvertising = NimBLEDevice::getAdvertising();
+    // Advertise the primary service UUID so mobile devices can filter by it
     pAdvertising->addServiceUUID(SERVICE_UUID);
-    pAdvertising->setScanResponseData(NimBLEAdvertisementData());
-    pAdvertising->setMinInterval(0x0);  // set value to 0x00 to not advertise this parameter
-    
+    // Include the device name in the advertisement payload so iOS scanners see it quickly
+    pAdvertising->setName(DEVICE_NAME);
+    // Make sure service UUID and name are available in the scan response
+    // Construct a scan response payload containing the local name
+    NimBLEAdvertisementData scanResp;
+    scanResp.setName(DEVICE_NAME);
+    pAdvertising->setScanResponseData(scanResp);
+
     Serial.println("Starting BLE advertising...");
     NimBLEDevice::startAdvertising();
     
